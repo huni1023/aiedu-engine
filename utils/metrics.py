@@ -25,21 +25,11 @@ def map_at_k(actual: np.ndarray, pred: np.ndarray, top_k: int) -> float:
     map_ = 0
 
     num_users = len(pred)
-    print(num_users)
     top_k_items = _topk(input=pred, k=top_k)
-    # print('> top K', top_k_items)
-    # print('> top K', top_k_items[0])
-    # print('> top K', top_k_items.shape) # shape: column 10, cause it's 10 items
 
     for i in range(num_users):
         actual_item = set(actual[i].nonzero()[0])
         pred_item = top_k_items[i]
-        if i == 0:
-            # print('> actual ', actual[i].nonzero()) # dtype: tuple
-            print('> actual ', actual[i].nonzero()[0])
-            print('> actual ', actual_item)
-            print('> pred item: ', pred_item)
-
         map_ += _ap_at_k(actual=actual_item, pred=pred_item, top_k=top_k)
 
     return map_ / num_users

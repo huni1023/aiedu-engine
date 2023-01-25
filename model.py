@@ -48,7 +48,8 @@ class CDAE(nn.Module):
         self.decoder = nn.Linear(num_hidden_units, num_items)
 
         # Set to use GPU
-        self.cuda()
+        if torch.cuda.is_available():
+            self.cuda()
 
     def forward(
         self, user_idx: torch.Tensor, matrix: torch.Tensor
@@ -88,8 +89,12 @@ class CDAE(nn.Module):
         loss_f = nn.BCEWithLogitsLoss()
 
         for (indices, input_mat) in train_loader:
-            indices = indices.cuda()
-            input_mat = input_mat.float().cuda()
+            if torch.cuda.is_available():
+                indices = indices.cuda()
+                input_mat = input_mat.float().cuda()
+            else:
+                indices = indices
+                input_mat = input_mat.float()
             self.zero_grad()
 
             predict_mat = self.forward(user_idx=indices, matrix=input_mat)
@@ -118,8 +123,12 @@ class CDAE(nn.Module):
             preds = np.zeros_like(train_loader.dataset.data)
 
             for (indices, input_mat) in train_loader:
-                indices = indices.cuda()
-                input_mat = input_mat.float().cuda()
+                if torch.cuda.is_available():
+                    indices = indices.cuda()
+                    input_mat = input_mat.float().cuda()
+                else:
+                    indices = indices
+                    input_mat = input_mat.float()
                 batch_pred = torch.sigmoid(self.forward(indices, input_mat))
                 batch_pred = batch_pred.masked_fill(
                     input_mat.bool(), float("-inf")
