@@ -2,6 +2,7 @@ import os
 
 import numpy as np
 import pandas as pd
+import torch
 import torch.backends.cudnn as cudnn
 import torch.optim as optim
 import torch.utils.data as data
@@ -68,9 +69,14 @@ if __name__ == "__main__":
     )
     optimizer = optim.Adam(model.parameters(), lr=params["learning_rate"])
 
+    best_loss = float("+inf")
+
     for epoch in tqdm(range(params["epochs"])):
         loss = model.train_one_epoch(train_loader, optimizer)
         print(f"[Epoch {epoch}]:: Loss: {loss}")
+        if loss < best_loss:
+            torch.save(model.state_dict(), './data/model.pt')
+            
 
     preds = model.predict(train_loader=train_loader)
 
